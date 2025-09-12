@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گزارش مالی شش ماهه ساختمان نگین زمرد</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .rtl-grid {
+            direction: rtl;
+        }
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #003f5c;
+        }
+        .kpi-label {
+            font-size: 1.1rem;
+            color: #7a5195;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#003f5c]">گزارش مالی ساختمان نگین زمرد</h1>
+            <p class="text-xl text-gray-600 mt-2">خلاصه عملکرد شش ماهه اول سال ۱۴۰۴ (فروردین تا شهریور)</p>
+        </header>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center mb-12 rtl-grid">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <p class="kpi-value" id="total-income">۱٬۶۲۴٬۰۰۰٬۰۰۰</p>
+                <p class="kpi-label">مجموع درآمد (ریال)</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <p class="kpi-value" id="total-expense">۵۵۶٬۸۰۰٬۰۰۰</p>
+                <p class="kpi-label">مجموع هزینه (ریال)</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <p class="kpi-value text-green-600" id="net-balance">۱٬۰۶۷٬۲۰۰٬۰۰۰</p>
+                <p class="kpi-label">مانده حساب (ریال)</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <p class="kpi-value text-blue-600" id="payment-rate">۹۱.۷٪</p>
+                <p class="kpi-label">نرخ پرداخت موفق واحدها</p>
+            </div>
+        </section>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8 rtl-grid">
+
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-1 text-center text-[#003f5c]">سهم هر هزینه از کل مخارج</h2>
+                <p class="text-center text-gray-600 mb-4">این نمودار نشان می‌دهد که حقوق سرایدار و قبض آب بیشترین بخش هزینه‌های ساختمان را تشکیل می‌دهند.</p>
+                <div class="chart-container">
+                    <canvas id="expenseDoughnutChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-1 text-center text-[#003f5c]">روند درآمد و هزینه ماهانه</h2>
+                 <p class="text-center text-gray-600 mb-4">مقایسه درآمد حاصل از شارژ واحدها با هزینه‌های ماهانه ساختمان. درآمد ثابت بوده در حالی که هزینه‌ها نوسان داشته‌اند.</p>
+                <div class="chart-container h-full max-h-[420px]">
+                    <canvas id="trendsLineChart"></canvas>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-1 text-center text-[#003f5c]">وضعیت بدهی واحدها</h2>
+                <p class="text-center text-gray-600 mb-4">از مجموع ۳۶ واحد، تنها ۳ واحد دارای بدهی معوقه هستند. این نمودار میزان بدهی هر یک از این واحدها را تا پایان شهریورماه نمایش می‌دهد.</p>
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-2 chart-container h-[250px] md:h-full">
+                         <canvas id="debtBarChart"></canvas>
+                    </div>
+                    <div class="flex flex-col justify-center items-center text-center p-4">
+                        <div class="mb-4">
+                            <span class="text-6xl text-green-500">۳۳</span>
+                            <p class="text-lg text-gray-700 font-semibold">واحد تسویه کامل</p>
+                        </div>
+                        <div>
+                            <span class="text-6xl text-red-500">۳</span>
+                            <p class="text-lg text-gray-700 font-semibold">واحد دارای بدهی</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script>
+        const formatRial = (num) => num.toLocaleString('fa-IR');
+        
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            }
+            return label;
+        };
+
+        const tooltipLabelCallback = (context) => {
+            let label = context.dataset.label || '';
+            if (label) {
+                label += ': ';
+            }
+            if (context.parsed.y !== null) {
+                label += formatRial(context.parsed.y) + ' ریال';
+            }
+            return label;
+        };
+        
+        const tooltipLabelCallbackHorizontal = (context) => {
+             let label = context.dataset.label || '';
+            if (label) {
+                label += ': ';
+            }
+            if (context.parsed.x !== null) {
+                label += formatRial(context.parsed.x) + ' ریال';
+            }
+            return label;
+        }
+
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback,
+                        label: tooltipLabelCallback
+                    },
+                    bodyFont: { family: 'Vazirmatn' },
+                    titleFont: { family: 'Vazirmatn' },
+                    rtl: true,
+                },
+                legend: {
+                    labels: {
+                        font: {
+                            family: 'Vazirmatn',
+                            size: 12
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value) {
+                            return formatRial(value);
+                        },
+                        font: { family: 'Vazirmatn' }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: { family: 'Vazirmatn' }
+                    },
+                     grid: {
+                        display: false
+                    }
+                }
+            }
+        };
+
+        const expenseData = {
+            labels: ['حقوق سرایدار', 'قبض آب', 'باغبانی', 'قبض برق', 'تجهیزات', 'آسانسور', 'قبض گاز', 'ابزار', 'نظافت'],
+            datasets: [{
+                label: 'هزینه',
+                data: [300000000, 119000000, 36000000, 24000000, 24000000, 18000000, 16800000, 16000000, 3000000],
+                backgroundColor: ['#003f5c', '#485780', '#7a5195', '#a94d9f', '#d34b97', '#f25185', '#ff666e', '#ff8458', '#ffa600'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        };
+        const expenseDoughnutCtx = document.getElementById('expenseDoughnutChart').getContext('2d');
+        new Chart(expenseDoughnutCtx, {
+            type: 'doughnut',
+            data: expenseData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback,
+                            label: (context) => {
+                                let value = context.parsed;
+                                let total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                let percentage = (value / total * 100).toFixed(1);
+                                return `${formatRial(value)} ریال (${percentage}%)`;
+                            }
+                        },
+                         bodyFont: { family: 'Vazirmatn' },
+                         titleFont: { family: 'Vazirmatn' },
+                         rtl: true,
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: 'Vazirmatn', size: 12 },
+                            boxWidth: 15
+                        }
+                    }
+                }
+            }
+        });
+
+        const monthlyIncome = [288000000, 280000000, 264000000, 264000000, 264000000, 264000000];
+        const monthlyExpense = [82300000, 102300000, 57500000, 61500000, 61500000, 150500000];
+        const trendData = {
+            labels: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور'],
+            datasets: [
+                {
+                    label: 'درآمد',
+                    data: monthlyIncome,
+                    borderColor: '#003f5c',
+                    backgroundColor: 'rgba(0, 63, 92, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'هزینه',
+                    data: monthlyExpense,
+                    borderColor: '#ff6361',
+                    backgroundColor: 'rgba(255, 99, 97, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }
+            ]
+        };
+        const trendsLineCtx = document.getElementById('trendsLineChart').getContext('2d');
+        new Chart(trendsLineCtx, {
+            type: 'line',
+            data: trendData,
+            options: defaultChartOptions
+        });
+
+        const debtData = {
+            labels: ['واحد ۱۳', 'واحد ۷', 'واحد ۱۰'],
+            datasets: [{
+                label: 'میزان بدهی',
+                data: [40000000, 32000000, 32000000],
+                backgroundColor: ['#ef5675', '#ff764a', '#ffa600'],
+                borderRadius: 5,
+                borderWidth: 0
+            }]
+        };
+        const debtBarCtx = document.getElementById('debtBarChart').getContext('2d');
+        new Chart(debtBarCtx, {
+            type: 'bar',
+            data: debtData,
+            options: {
+                indexAxis: 'y',
+                 responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                     tooltip: {
+                         callbacks: {
+                            title: tooltipTitleCallback,
+                            label: tooltipLabelCallbackHorizontal
+                         },
+                         bodyFont: { family: 'Vazirmatn' },
+                         titleFont: { family: 'Vazirmatn' },
+                         rtl: true,
+                    },
+                    legend: {
+                       display: false
+                    }
+                },
+                 scales: {
+                    x: {
+                        ticks: {
+                            callback: function(value) {
+                                return formatRial(value / 1000000) + 'م';
+                            },
+                             font: { family: 'Vazirmatn' }
+                        },
+                         grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    },
+                    y: {
+                        ticks: { font: { family: 'Vazirmatn' } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
