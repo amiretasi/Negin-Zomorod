@@ -98,7 +98,7 @@
 
     <nav class="sticky top-0 bg-white/80 backdrop-blur-sm shadow-md z-50">
         <div class="container mx-auto px-4">
-            <div class="flex justify-center items-center h-16">
+            <div class="flex justify-center items-center h-16 gap-x-10">
                 <a href="#bilan" class="nav-link">بیلان کلی</a>
                 <a href="#charge-debt" class="nav-link">بدهی شارژ</a>
                 <a href="#cumulative-trend" class="nav-link">نمودار درآمد و هزینه</a>
@@ -233,8 +233,11 @@
 
     </div>
     
-    <footer class="text-center py-6 mt-8 bg-gray-200">
+    <footer class="text-center py-6 mt-8 bg-gray-200 relative">
         <p class="text-gray-600">توسعه داده شده توسط امیررضا اعطاسی</p>
+        <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 bg-[#003f5c] text-white rounded-full h-12 w-12 flex items-center justify-center text-2xl hover:bg-[#7a5195] transition-colors shadow-lg" aria-label="برو به بالای صفحه">
+            &#9650;
+        </a>
     </footer>
 
 
@@ -594,4 +597,6 @@
     </script>
 </body>
 </html>
+
+
 
