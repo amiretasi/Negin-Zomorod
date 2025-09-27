@@ -26,6 +26,10 @@
                 height: 350px;
             }
         }
+        #debt-chart-container {
+             height: 550px;
+             max-height: 600px;
+        }
         .rtl-grid {
             direction: rtl;
         }
@@ -144,7 +148,7 @@
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
                 <h2 class="text-2xl font-bold mb-1 text-center text-[#003f5c]">تفکیک بدهی تجمعی واحدها تا شهریور ۱۴۰۴</h2>
                 <p class="text-center text-gray-600 mb-4">میزان کل بدهی معوقه ساکنین به صندوق ساختمان تا پایان این دوره، مبلغ <span class="text-red-600 font-bold">۱٬۰۳۰٬۴۷۰٬۰۰۰</span> ریال می‌باشد.</p>
-                 <div class="chart-container h-full max-h-[450px]">
+                 <div id="debt-chart-container" class="chart-container">
                      <canvas id="debtBarChart"></canvas>
                 </div>
             </div>
@@ -176,7 +180,7 @@
                     <p class="kpi-label">کل پرداختی به اداره آب (ریال)</p>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
-                    <p class="kpi-value text-red-500" id="sewage-debt-total">۱۸۷٬۲۷۸٬۸۸۹</p>
+                    <p class="kpi-value text-red-500" id="sewage-debt-total">۱۱۲٬۰۳۰٬۰۰۰</p>
                     <p class="kpi-label">بدهی معوقه ساکنین (ریال)</p>
                 </div>
             </section>
@@ -184,7 +188,7 @@
             <div class="bg-white p-6 rounded-xl shadow-lg">
                 <h2 class="text-2xl font-bold mb-1 text-center text-[#003f5c]">واحدهای بدهکار در پروژه فاضلاب</h2>
                 <p class="text-center text-gray-600 mb-4">تعهد پرداخت ساکنین تا این تاریخ شامل پیش‌پرداخت و ۹ قسط می‌باشد. نمودار زیر توزیع بدهی معوقه را بین واحدهای بدهکار نمایش می‌دهد.</p>
-                 <div class="chart-container h-full max-h-[450px]">
+                 <div id="sewage-chart-container" class="chart-container">
                      <canvas id="sewageDebtChart"></canvas>
                 </div>
             </div>
@@ -247,10 +251,10 @@
                     ticks: {
                         callback: function(value) {
                              if (value >= 1.0e9) {
-                                return (value / 1.0e9).toFixed(1) + 'م'; // میلیارد
+                                return (value / 1.0e9).toFixed(1) + 'میلیارد';
                             }
                             if (value >= 1.0e6) {
-                                return (value / 1.0e6).toFixed(0) + 'م'; // میلیون
+                                return (value / 1.0e6).toFixed(0) + 'میلیون';
                             }
                             return formatRial(value);
                         },
@@ -338,6 +342,7 @@
             type: 'bar',
             data: debtData,
             options: {
+                 indexAxis: 'y',
                  responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
@@ -349,8 +354,8 @@
                                 if (label) {
                                     label += ': ';
                                 }
-                                if (context.parsed.y !== null) {
-                                    label += formatRial(context.parsed.y) + ' ریال';
+                                if (context.parsed.x !== null) {
+                                    label += formatRial(context.parsed.x) + ' ریال';
                                 }
                                 return label;
                            }
@@ -368,14 +373,14 @@
                     }
                 },
                  scales: {
-                    x: {
+                    y: {
                         ticks: { 
                             font: { family: 'Vazirmatn', size: 9 }
                         },
                         grid: { display: false },
                         stacked: true,
                     },
-                    y: {
+                    x: {
                         ticks: { 
                             callback: function(value) {
                                 return formatRial(value / 1000000) + 'م';
@@ -428,30 +433,15 @@
                 borderWidth: 0
             }]
         };
-
-        // Filter out units with zero or less debt before rendering
-        const filteredLabels = [];
-        const filteredData = [];
-        sewageDebtData.labels.forEach((label, index) => {
-            if (sewageDebtData.datasets[0].data[index] > 0) {
-                filteredLabels.push(label);
-                filteredData.push(sewageDebtData.datasets[0].data[index]);
-            }
-        });
-
-        const finalSewageDebtData = {
-            labels: filteredLabels,
-            datasets: [{
-                ...sewageDebtData.datasets[0],
-                data: filteredData
-            }]
-        };
+        
+        const sewageChartContainer = document.getElementById('sewage-chart-container');
+        sewageChartContainer.style.height = `${sewageDebtData.labels.length * 25}px`;
 
 
         const sewageDebtCtx = document.getElementById('sewageDebtChart').getContext('2d');
         new Chart(sewageDebtCtx, {
             type: 'bar',
-            data: finalSewageDebtData,
+            data: sewageDebtData,
             options: {
                 indexAxis: 'y',
                 responsive: true,
