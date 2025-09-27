@@ -159,6 +159,37 @@
 
         </main>
 
+        <hr class="my-12 border-t-2 border-gray-300">
+
+        <section id="sewage-project" class="mt-8">
+            <header class="text-center mb-10">
+                <h1 class="text-4xl md:text-5xl font-bold text-[#003f5c]">گزارش مالی وضعیت دریافت و پرداخت اقساط انشعاب فاضلاب</h1>
+            </header>
+    
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-center mb-12 rtl-grid max-w-5xl mx-auto">
+                <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
+                    <p class="kpi-value" id="sewage-collected">۳٬۵۰۸٬۰۴۰٬۰۰۰</p>
+                    <p class="kpi-label">کل وصولی از ساکنین (ریال)</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
+                    <p class="kpi-value" id="sewage-paid">۳٬۳۲۰٬۷۶۱٬۱۱۱</p>
+                    <p class="kpi-label">کل پرداختی به اداره آب (ریال)</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
+                    <p class="kpi-value text-red-500" id="sewage-debt-total">۱۸۷٬۲۷۸٬۸۸۹</p>
+                    <p class="kpi-label">بدهی معوقه ساکنین (ریال)</p>
+                </div>
+            </section>
+
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-1 text-center text-[#003f5c]">واحدهای بدهکار در پروژه فاضلاب</h2>
+                <p class="text-center text-gray-600 mb-4">تعهد پرداخت ساکنین تا این تاریخ شامل پیش‌پرداخت و ۹ قسط می‌باشد. نمودار زیر توزیع بدهی معوقه را بین واحدهای بدهکار نمایش می‌دهد.</p>
+                 <div class="chart-container h-full max-h-[450px]">
+                     <canvas id="sewageDebtChart"></canvas>
+                </div>
+            </div>
+        </section>
+
     </div>
 
     <script>
@@ -386,10 +417,86 @@
             options: defaultChartOptions
         });
 
+        // --- New Sewage Chart ---
+        const sewageDebtData = {
+            labels: ['واحد ۱', 'واحد ۲', 'واحد ۳', 'واحد ۴', 'واحد ۶', 'واحد ۷', 'واحد ۸', 'واحد ۱۴', 'واحد ۱۶', 'واحد ۲۱', 'واحد ۲۳', 'واحد ۲۴', 'واحد ۳۰', 'واحد ۳۴', 'واحد ۳۵', 'واحد ۳۶'],
+            datasets: [{
+                label: 'بدهی قسط فاضلاب',
+                data: [6590000, 6590000, 6590000, 6590000, 6590000, 6590000, 13180000, 6590000, 6590000, 6590000, 6590000, 6590000, 6590000, 6590000, 6590000, 6590000],
+                backgroundColor: '#d34b97',
+                borderRadius: 5,
+                borderWidth: 0
+            }]
+        };
+
+        // Filter out units with zero or less debt before rendering
+        const filteredLabels = [];
+        const filteredData = [];
+        sewageDebtData.labels.forEach((label, index) => {
+            if (sewageDebtData.datasets[0].data[index] > 0) {
+                filteredLabels.push(label);
+                filteredData.push(sewageDebtData.datasets[0].data[index]);
+            }
+        });
+
+        const finalSewageDebtData = {
+            labels: filteredLabels,
+            datasets: [{
+                ...sewageDebtData.datasets[0],
+                data: filteredData
+            }]
+        };
+
+
+        const sewageDebtCtx = document.getElementById('sewageDebtChart').getContext('2d');
+        new Chart(sewageDebtCtx, {
+            type: 'bar',
+            data: finalSewageDebtData,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback,
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.x !== null) {
+                                    label += formatRial(context.parsed.x) + ' ریال';
+                                }
+                                return label;
+                            }
+                        },
+                        bodyFont: { family: 'Vazirmatn' },
+                        titleFont: { family: 'Vazirmatn' },
+                        rtl: true,
+                    },
+                    legend: {
+                       display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: function(value) {
+                                return formatRial(value / 1000000) + 'م';
+                            },
+                            font: { family: 'Vazirmatn' }
+                        },
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    },
+                    y: {
+                        ticks: { font: { family: 'Vazirmatn', size: 10 } },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
 
     </script>
 </body>
 </html>
-
-
 
