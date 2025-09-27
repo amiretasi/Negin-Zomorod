@@ -92,13 +92,18 @@
             opacity: 1;
             transform: translateY(0);
         }
+        #details-table-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
     <nav class="sticky top-0 bg-white/80 backdrop-blur-sm shadow-md z-50">
         <div class="container mx-auto px-4">
-            <div class="flex justify-center items-center h-16 gap-x-10">
+            <div class="flex justify-center items-center h-16 gap-x-12">
                 <a href="#bilan" class="nav-link">بیلان کلی</a>
                 <a href="#charge-debt" class="nav-link">بدهی شارژ</a>
                 <a href="#cumulative-trend" class="nav-link">نمودار درآمد و هزینه</a>
@@ -190,6 +195,42 @@
                 </div>
             </div>
             
+             <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-lg mt-8 animate-on-scroll">
+                <button id="toggle-details-table" class="w-full text-right text-xl font-bold text-[#003f5c] p-4 bg-gray-50 hover:bg-gray-100 rounded-lg flex justify-between items-center transition">
+                    <span>جدول کامل بدهی‌ها (مالکین و مستاجرین)</span>
+                    <span id="toggle-icon" class="transform transition-transform duration-300">+</span>
+                </button>
+                <div id="details-table-container" class="">
+                    <div class="overflow-x-auto mt-4">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">واحد</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">نام مالک</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">وضعیت سکونت</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">بدهی شارژ ۱۴۰۳</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">بدهی شارژ ۱۴۰۴</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">بدهی اقساط فاضلاب</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">جمع کل بدهی</th>
+                                </tr>
+                            </thead>
+                            <tbody id="details-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Rows will be injected here by script -->
+                            </tbody>
+                             <tfoot class="bg-gray-100 font-bold">
+                                <tr>
+                                    <td class="px-4 py-3 text-right text-sm" colspan="3">جمع کل</td>
+                                    <td id="total-debt-1403" class="px-4 py-3 text-right text-sm"></td>
+                                    <td id="total-debt-1404" class="px-4 py-3 text-right text-sm"></td>
+                                    <td id="total-sewage-debt-col" class="px-4 py-3 text-right text-sm"></td>
+                                    <td id="total-debt-all" class="px-4 py-3 text-right text-sm"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div id="cumulative-trend" class="lg:col-span-3 bg-white p-6 rounded-xl shadow-lg mt-8 animate-on-scroll">
                 <h2 class="text-2xl font-bold mb-1 text-center text-[#003f5c]">روند درآمد و هزینه تجمعی ماهانه (۱۸ ماهه)</h2>
                 <p class="text-center text-green-700 font-semibold text-lg mb-4">موجودی نهایی صندوق در پایان دوره: ۸۸٬۱۹۹٬۵۴۳ ریال</p>
@@ -248,6 +289,7 @@
             if (num < 0) {
                 return `(${Math.abs(num).toLocaleString('fa-IR')})`;
             }
+            if(num === 0) return '۰';
             return num.toLocaleString('fa-IR');
         };
         
@@ -398,6 +440,11 @@
                  indexAxis: 'y',
                  responsive: true,
                 maintainAspectRatio: false,
+                 layout: {
+                    padding: {
+                        right: 70 
+                    }
+                },
                 plugins: {
                      tooltip: {
                         callbacks: {
@@ -425,7 +472,7 @@
                        }
                     },
                     datalabels: {
-                       display: false
+                        display: false
                     }
                 },
                  scales: {
@@ -579,6 +626,62 @@
             }
         });
 
+        // --- Collapsible Table Logic ---
+        const ownerNames = ['امیری', 'صادقی', 'محمدی', 'احمدی', 'هاشمی', 'کریمی', 'رضایی', 'حسینی', 'جعفری', 'موسوی', 'نادری', 'قاسمی', 'صالحی', 'مرادی', 'شریفی', 'رحیمی', 'اکبری', 'عباسی', 'نوروزی', 'یوسفی', 'ابراهیمی', 'عزیزی', 'محمودی', 'باقری', 'سلیمانی', 'طهماسبی', 'فلاح', 'عسگری', 'حیدری', 'کاظمی', 'بیات', 'زمانی', 'گلستانی', 'شجاعی', 'وکیلی', 'اسدی'];
+        const statuses = ['مالک ساکن', 'مستاجر', 'مالک ساکن', 'مالک ساکن', 'مستاجر', 'خالی', 'مالک ساکن', 'مستاجر', 'مالک ساکن', 'مالک ساکن', 'مالک ساکن', 'مالک ساکن', 'مستاجر', 'مستاجر', 'مالک ساکن', 'مالک ساکن', 'مستاجر', 'مالک ساکن', 'مالک ساکن', 'مستاجر', 'مستاجر', 'مالک ساکن', 'مالک ساکن', 'مالک ساکن', 'خالی', 'مستاجر', 'مالک ساکن', 'مالک ساکن', 'مالک ساکن', 'مستاجر', 'مالک ساکن', 'مالک ساکن', 'مالک ساکن', 'مستاجر', 'مالک ساکن', 'مستاجر'];
+        const allUnitsData = [];
+        for (let i = 1; i <= 36; i++) {
+            const unitName = `واحد ${i}`;
+            const debtIndex = debtData.labels.indexOf(unitName);
+            const sewageDebtIndex = sewageDebtData.labels.indexOf(unitName);
+            const debt1403 = (debtIndex !== -1) ? debtData.datasets[0].data[debtIndex] : 0;
+            const debt1404 = (debtIndex !== -1) ? debtData.datasets[1].data[debtIndex] : 0;
+            const sewageDebt = (sewageDebtIndex !== -1) ? sewageDebtData.datasets[0].data[sewageDebtIndex] : 0;
+            const totalUnitDebt = debt1403 + debt1404 + sewageDebt;
+            allUnitsData.push({ unit: unitName, owner: ownerNames[i - 1], status: statuses[i - 1], debt1403: debt1403, debt1404: debt1404, sewageDebt: sewageDebt, totalUnitDebt: totalUnitDebt });
+        }
+
+        const tableBody = document.getElementById('details-table-body');
+        let totalDebt1403 = 0, totalDebt1404 = 0, totalSewageDebt = 0, grandTotalDebt = 0;
+        allUnitsData.forEach(unit => {
+            totalDebt1403 += unit.debt1403;
+            totalDebt1404 += unit.debt1404;
+            totalSewageDebt += unit.sewageDebt;
+            grandTotalDebt += unit.totalUnitDebt;
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-gray-50';
+            row.innerHTML = `
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${unit.unit}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${unit.owner}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${unit.status}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatRial(unit.debt1403)}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatRial(unit.debt1404)}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatRial(unit.sewageDebt)}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-800">${formatRial(unit.totalUnitDebt)}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        document.getElementById('total-debt-1403').textContent = formatRial(totalDebt1403);
+        document.getElementById('total-debt-1404').textContent = formatRial(totalDebt1404);
+        document.getElementById('total-sewage-debt-col').textContent = formatRial(totalSewageDebt);
+        document.getElementById('total-debt-all').textContent = formatRial(grandTotalDebt);
+
+
+        const toggleButton = document.getElementById('toggle-details-table');
+        const tableContainer = document.getElementById('details-table-container');
+        const toggleIcon = document.getElementById('toggle-icon');
+        toggleButton.addEventListener('click', () => {
+            if (tableContainer.style.maxHeight) {
+                tableContainer.style.maxHeight = null;
+                toggleIcon.style.transform = 'rotate(0deg)';
+            } else {
+                tableContainer.style.maxHeight = tableContainer.scrollHeight + "px";
+                toggleIcon.style.transform = 'rotate(45deg)';
+            }
+        });
+
+
         // --- Animation on Scroll ---
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -597,6 +700,4 @@
     </script>
 </body>
 </html>
-
-
 
