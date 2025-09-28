@@ -122,20 +122,20 @@
 
         <section id="bilan" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center mb-12 rtl-grid animate-on-scroll">
             <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
-                <p class="kpi-value" id="total-income">۳٬۷۲۱٬۵۳۰٬۰۰۰</p>
+                <p class="kpi-value" id="total-income"></p>
                 <p class="kpi-label">مجموع درآمد تجمعی (ریال)</p>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
-                <p class="kpi-value" id="total-expense">۳٬۶۳۳٬۳۳۰٬۴۵۷</p>
+                <p class="kpi-value" id="total-expense"></p>
                 <p class="kpi-label">مجموع هزینه تجمعی (ریال)</p>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
-                <p class="kpi-value text-green-600" id="net-balance">۸۸٬۱۹۹٬۵۴۳</p>
+                <p class="kpi-value text-green-600" id="net-balance"></p>
                 <p class="kpi-label">مانده حساب کل (ریال)</p>
             </div>
              <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
-                <p class="kpi-value text-red-500" id="total-debt">۱٬۰۸۳٬۱۹۰٬۰۰۰</p>
-                <p class="kpi-label">کل بدهی تجمعی (ریال)</p>
+                <p class="kpi-value text-red-500" id="total-debt"></p>
+                <p class="kpi-label" id="total-debt-label"></p>
             </div>
         </section>
 
@@ -294,7 +294,6 @@
                 return num > 0 ? `<span class="text-red-600">${formattedNum}</span>` : '۰';
             }
 
-            // For balance columns
             if (num > 0) return `<span class="text-red-600">${formattedNum}</span>`; // Debt
             if (num < 0) return `<span class="text-green-600">${formattedNum}</span>`; // Credit
             return '۰';
@@ -415,7 +414,17 @@
                         }
                     },
                     datalabels: {
-                        display: false
+                        display: true,
+                        formatter: (value, ctx) => {
+                            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percentage = (value / total * 100).toFixed(1) + '%';
+                            return percentage;
+                        },
+                        color: '#fff',
+                        font: {
+                            weight: 'bold',
+                            family: 'Vazirmatn'
+                        }
                     }
                 }
             }
@@ -460,10 +469,18 @@
                                     label += context.parsed.x.toLocaleString('fa-IR') + ' ریال';
                                 }
                                 return label;
+                           },
+                           footer: function(tooltipItems) {
+                                let sum = 0;
+                                tooltipItems.forEach(function(tooltipItem) {
+                                    sum += tooltipItem.parsed.x;
+                                });
+                                return 'جمع کل: ' + sum.toLocaleString('fa-IR') + ' ریال';
                            }
                         },
                          bodyFont: { family: 'Vazirmatn' },
                          titleFont: { family: 'Vazirmatn' },
+                         footerFont: { family: 'Vazirmatn', weight: 'bold'},
                          rtl: true,
                     },
                     legend: {
@@ -499,12 +516,21 @@
                     x: {
                         ticks: { 
                             callback: function(value) {
-                                return (value / 1000000).toLocaleString('fa-IR') + 'م';
+                                return (value / 1000000).toLocaleString('fa-IR');
                             },
                             font: { family: 'Vazirmatn' } 
                         },
                         grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                        stacked: true
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: 'میلیون ریال',
+                            font: {
+                                family: 'Vazirmatn',
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
                     }
                 }
             }
@@ -681,6 +707,19 @@
                 totalUnitDebt: totalUnitDebt 
             };
         });
+
+        // --- Populate KPIs ---
+        const totalIncome = 3721530000;
+        const totalExpense = 3633330457;
+        const netBalance = totalIncome - totalExpense;
+        const totalChargeDebt = allUnitsData.reduce((sum, unit) => sum + unit.debt1403 + unit.debt1404, 0);
+
+        document.getElementById('total-income').textContent = totalIncome.toLocaleString('fa-IR');
+        document.getElementById('total-expense').textContent = totalExpense.toLocaleString('fa-IR');
+        document.getElementById('net-balance').textContent = netBalance.toLocaleString('fa-IR');
+        document.getElementById('total-debt').textContent = totalChargeDebt.toLocaleString('fa-IR');
+        document.getElementById('total-debt-label').textContent = 'کل بدهی شارژ (۱۴۰۳ و ۱۴۰۴)';
+
 
         const tableBody = document.getElementById('details-table-body');
         let totalDebt1403 = 0, totalDebt1404 = 0, totalSewageDebt = 0, grandTotalDebt = 0;
