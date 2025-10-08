@@ -32,9 +32,6 @@
                 height: 350px;
             }
         }
-        #debt-chart-container {
-             height: 550px;
-        }
         #cumulative-chart-container {
             height: 350px;
             max-height: 420px;
@@ -159,7 +156,7 @@
                 <h3 class="bilan-title">بیلان شش ماهه اول ۱۴۰۴</h3>
                 <div class="bilan-item">
                     <span class="bilan-label">درآمد محقق شده:</span>
-                    <span class="bilan-value text-green-700">۱٬۰۹۲٬۰۰۰٬۰۰۰</span>
+                    <span class="bilan-value text-green-700" id="income-1404"></span>
                 </div>
                 <div class="bilan-item">
                     <span class="bilan-label">هزینه‌های ثبت شده:</span>
@@ -167,7 +164,7 @@
                 </div>
                 <div class="bilan-item">
                     <span class="bilan-label">مانده دوره:</span>
-                    <span class="bilan-value text-red-700">(۱٬۳۴۷٬۲۸۱٬۰۰۰)</span>
+                    <span class="bilan-value text-red-700" id="balance-1404"></span>
                 </div>
             </div>
         </section>
@@ -184,7 +181,7 @@
             
             <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
                 <h2 class="text-2xl font-bold mb-1 text-center text-[#003f5c]">تفکیک بدهی تجمعی واحدها تا شهریور ۱۴۰۴</h2>
-                <p class="text-center text-gray-600 mb-4">میزان کل بدهی معوقه ساکنین به صندوق ساختمان تا پایان این دوره، مبلغ <span class="text-red-600 font-bold">۱٬۰۳۰٬۴۷۰٬۰۰۰</span> ریال می‌باشد.</p>
+                <p class="text-center text-gray-600 mb-4">میزان کل بدهی معوقه شارژ ساکنین به صندوق ساختمان تا پایان این دوره، مبلغ <span class="text-red-600 font-bold" id="total-charge-debt-text"></span> ریال می‌باشد.</p>
                  <div id="debt-chart-container" class="chart-container">
                      <canvas id="debtBarChart"></canvas>
                 </div>
@@ -212,7 +209,7 @@
                                     <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">بدهی شارژ ۱۴۰۳</th>
                                     <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">بدهی شارژ ۱۴۰۴</th>
                                     <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">بدهی / بستانکاری فاضلاب</th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">جمع کل بدهی</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">جمع بدهی شارژ</th>
                                 </tr>
                             </thead>
                             <tbody id="details-table-body" class="bg-white divide-y divide-gray-200">
@@ -251,7 +248,7 @@
     
             <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-center mb-12 rtl-grid max-w-5xl mx-auto">
                 <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
-                    <p class="kpi-value" id="sewage-collected">۳٬۵۰۸٬۰۴۰٬۰۰۰</p>
+                    <p class="kpi-value" id="sewage-collected"></p>
                     <p class="kpi-label">کل وصولی از ساکنین (ریال)</p>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
@@ -259,14 +256,14 @@
                     <p class="kpi-label">کل پرداختی به اداره آب (ریال)</p>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-center">
-                    <p class="kpi-value text-red-500" id="sewage-debt-total">۵۲٬۷۲۰٬۰۰۰</p>
+                    <p class="kpi-value text-red-500" id="sewage-debt-total"></p>
                     <p class="kpi-label">بدهی معوقه ساکنین (ریال)</p>
                 </div>
             </section>
 
             <div class="bg-white p-6 rounded-xl shadow-lg">
                 <h2 class="text-2xl font-bold mb-1 text-center text-[#003f5c]">واحدهای بدهکار در پروژه فاضلاب</h2>
-                <p class="text-center text-gray-600 mb-4">تعهد پرداخت ساکنین تا این تاریخ شامل پیش‌پرداخت و ۹ قسط می‌باشد. نمودار زیر توزیع بدهی معوقه را بین واحدهای بدهکار نمایش می‌دهد.</p>
+                <p class="text-center text-gray-600 mb-4">تعهد پرداخت ساکنین تا این تاریخ شامل پیش‌پرداخت و ۱۰ قسط می‌باشد. نمودار زیر توزیع بدهی معوقه را بین واحدهای بدهکار نمایش می‌دهد.</p>
                  <div id="sewage-chart-container" class="chart-container">
                      <canvas id="sewageDebtChart"></canvas>
                 </div>
@@ -284,515 +281,497 @@
 
 
     <script>
-        Chart.register(ChartDataLabels);
+        document.addEventListener('DOMContentLoaded', () => {
+            Chart.register(ChartDataLabels);
 
-        const formatRialForTable = (num, type = 'balance') => {
-            if (num === 0) return '۰';
-            const formattedNum = Math.abs(num).toLocaleString('fa-IR');
+            const formatRialForTable = (num, type = 'balance') => {
+                if (num === 0) return '۰';
+                const formattedNum = Math.abs(num).toLocaleString('fa-IR');
+                
+                if (type === 'pure_debt') {
+                    return num > 0 ? `<span class="text-red-600">${formattedNum}</span>` : '۰';
+                }
+
+                if (num > 0) return `<span class="text-red-600">${formattedNum}</span>`; // Debt
+                if (num < 0) return `<span class="text-green-600">${formattedNum}</span>`; // Credit
+                return '۰';
+            };
             
-            if (type === 'pure_debt') {
-                return num > 0 ? `<span class="text-red-600">${formattedNum}</span>` : '۰';
-            }
-
-            if (num > 0) return `<span class="text-red-600">${formattedNum}</span>`; // Debt
-            if (num < 0) return `<span class="text-green-600">${formattedNum}</span>`; // Credit
-            return '۰';
-        };
-        
-        const tooltipTitleCallback = (tooltipItems) => {
-            const item = tooltipItems[0];
-            let label = item.chart.data.labels[item.dataIndex];
-            if (Array.isArray(label)) {
-                return label.join(' ');
-            }
-            return label;
-        };
-        
-        const tooltipLabelCallback = (context) => {
-            let label = context.dataset.label || '';
-            if (label) {
-                label += ': ';
-            }
-            if (context.parsed.y !== null) {
-                label += context.parsed.y.toLocaleString('fa-IR') + ' ریال';
-            }
-            return label;
-        };
-
-        const defaultChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        title: tooltipTitleCallback,
-                        label: tooltipLabelCallback
-                    },
-                    bodyFont: { family: 'Vazirmatn' },
-                    titleFont: { family: 'Vazirmatn' },
-                    rtl: true,
-                },
-                legend: {
-                    labels: {
-                        font: {
-                            family: 'Vazirmatn',
-                            size: 12
-                        }
-                    }
-                },
-                datalabels: {
-                   display: false 
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
                 }
-            },
-            scales: {
-                y: {
-                    ticks: {
-                        callback: function(value) {
-                             if (value >= 1.0e9) {
-                                return (value / 1.0e9).toFixed(1) + 'میلیارد';
-                            }
-                            if (value >= 1.0e6) {
-                                return (value / 1.0e6).toFixed(0) + 'میلیون';
-                            }
-                            return value.toLocaleString('fa-IR');
-                        },
-                        font: { family: 'Vazirmatn' }
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    }
-                },
-                x: {
-                    ticks: {
-                        font: { family: 'Vazirmatn', size: 10 }
-                    },
-                     grid: {
-                        display: false
-                    }
+                return label;
+            };
+            
+            const tooltipLabelCallback = (context) => {
+                let label = context.dataset.label || '';
+                if (label) {
+                    label += ': ';
                 }
-            }
-        };
+                if (context.parsed.y !== null) {
+                    label += context.parsed.y.toLocaleString('fa-IR') + ' ریال';
+                }
+                return label;
+            };
 
-        const expenseData = {
-            labels: ['حقوق و نگهداری', 'هزینه های تاسیسات', 'قبوض خدماتی', 'هزینه های عمرانی', 'متفرقه'],
-            datasets: [{
-                label: 'هزینه',
-                data: [1418900000, 1094860200, 620650800, 316000000, 182919457],
-                backgroundColor: ['#003f5c', '#7a5195', '#d34b97', '#ff666e', '#ffa600'],
-                borderWidth: 0,
-                hoverOffset: 4
-            }]
-        };
-
-        const expenseDoughnutCtx = document.getElementById('expenseDoughnutChart').getContext('2d');
-        new Chart(expenseDoughnutCtx, {
-            type: 'doughnut',
-            data: expenseData,
-            options: {
+            const defaultChartOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     tooltip: {
                         callbacks: {
                             title: tooltipTitleCallback,
-                            label: (context) => {
-                                let value = context.parsed;
-                                let total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                let percentage = (value / total * 100).toFixed(1);
-                                return `${value.toLocaleString('fa-IR')} ریال (${percentage}%)`;
-                            }
-                        },
-                         bodyFont: { family: 'Vazirmatn' },
-                         titleFont: { family: 'Vazirmatn' },
-                         rtl: true,
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: { family: 'Vazirmatn', size: 11 },
-                            boxWidth: 15
-                        }
-                    },
-                    datalabels: {
-                        display: false
-                    }
-                }
-            }
-        });
-        
-        const debtData = {
-            labels: ['واحد ۱', 'واحد ۲', 'واحد ۶', 'واحد ۷', 'واحد ۸', 'واحد ۹', 'واحد ۱۱', 'واحد ۱۲', 'واحد ۱۴', 'واحد ۱۵', 'واحد ۱۶', 'واحد ۱۸', 'واحد ۱۹', 'واحد ۲۰', 'واحد ۲۱', 'واحد ۲۳', 'واحد ۲۴', 'واحد ۲۵', 'واحد ۲۶', 'واحد ۲۸', 'واحد ۳۰', 'واحد ۳۴', 'واحد ۳۵', 'واحد ۳۶'],
-            datasets: [
-                {
-                    label: 'بدهی سال ۱۴۰۳',
-                    data: [42000000, 14000000, 0, 0, 60000000, 0, 0, 0, 9000000, 24000000, 0, 16000000, 0, 0, 19470000, 0, 0, 84000000, 0, 0, 0, 42000000, 0, 84000000],
-                    backgroundColor: '#003f5c',
-                    borderRadius: 5,
-                },
-                {
-                    label: 'بدهی سال ۱۴۰۴',
-                    data: [48000000, 0, 8000000, 16000000, 48000000, 8000000, 8000000, 8000000, 16000000, 20000000, 8000000, 48000000, 8000000, 48000000, 48000000, 48000000, 16000000, 16000000, 8000000, 16000000, 48000000, 48000000, 48000000, 48000000],
-                    backgroundColor: '#7a5195',
-                    borderRadius: 5,
-                }
-            ]
-        };
-
-        const debtBarCtx = document.getElementById('debtBarChart').getContext('2d');
-        new Chart(debtBarCtx, {
-            type: 'bar',
-            data: debtData,
-            options: {
-                 indexAxis: 'y',
-                 responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                     tooltip: {
-                        callbacks: {
-                           title: tooltipTitleCallback,
-                           label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.x !== null) {
-                                    label += context.parsed.x.toLocaleString('fa-IR') + ' ریال';
-                                }
-                                return label;
-                           },
-                           footer: function(tooltipItems) {
-                                const dataIndex = tooltipItems[0].dataIndex;
-                                let sum = 0;
-                                tooltipItems[0].chart.data.datasets.forEach(dataset => {
-                                    sum += dataset.data[dataIndex];
-                                });
-                                return 'جمع کل شارژ: ' + sum.toLocaleString('fa-IR') + ' ریال';
-                           }
-                        },
-                         displayColors: true,
-                         bodyFont: { family: 'Vazirmatn' },
-                         titleFont: { family: 'Vazirmatn' },
-                         footerFont: { family: 'Vazirmatn', weight: 'bold', size: 12 },
-                         rtl: true,
-                    },
-                    legend: {
-                       display: true,
-                       position: 'top',
-                       labels: {
-                           font: { family: 'Vazirmatn', size: 12 }
-                       }
-                    },
-                    datalabels: {
-                        display: true,
-                        formatter: (value) => {
-                           if (value === 0) return '';
-                           const millions = value / 1000000;
-                           return millions % 1 === 0 ? millions.toLocaleString('fa-IR') : millions.toFixed(1).replace('.', '/').toLocaleString('fa-IR');
-                        },
-                        color: 'white',
-                        font: {
-                            weight: 'bold',
-                            family: 'Vazirmatn',
-                            size: 9,
-                        },
-                     }
-                },
-                 scales: {
-                    y: {
-                        ticks: { 
-                            font: { family: 'Vazirmatn', size: 9 }
-                        },
-                        grid: { display: false },
-                        stacked: true,
-                    },
-                    x: {
-                        ticks: { 
-                            callback: function(value) {
-                                return (value / 1000000).toLocaleString('fa-IR');
-                            },
-                            font: { family: 'Vazirmatn' } 
-                        },
-                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                        stacked: true,
-                        title: {
-                            display: true,
-                            text: 'میلیون ریال',
-                            font: {
-                                family: 'Vazirmatn',
-                                size: 12,
-                                weight: 'bold'
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        
-        const cumulativeTrendData = {
-            labels: ['فروردین ۰۳', 'اردیبهشت ۰۳', 'خرداد ۰۳', 'تیر ۰۳', 'مرداد ۰۳', 'شهریور ۰۳', 'مهر ۰۳', 'آبان ۰۳', 'آذر ۰۳', 'دی ۰۳', 'بهمن ۰۳', 'اسفند ۰۳', 'فروردین ۰۴', 'اردیبهشت ۰۴', 'خرداد ۰۴', 'تیر ۰۴', 'مرداد ۰۴', 'شهریور ۰۴'],
-            datasets: [
-                {
-                    label: 'درآمد تجمعی',
-                    data: [198000000, 399000000, 603000000, 807000000, 999000000, 1185000000, 1435000000, 1681000000, 1927000000, 2169530000, 2399530000, 2629530000, 2827530000, 3025530000, 3233530000, 3441530000, 3609530000, 3721530000],
-                    borderColor: '#003f5c',
-                    backgroundColor: 'rgba(0, 63, 92, 0.1)',
-                    fill: true,
-                    tension: 0.1
-                },
-                {
-                    label: 'هزینه تجمعی',
-                    data: [0, 0, 0, 76715000, 181385000, 266085000, 350613200, 465086657, 722209657, 946663657, 1038928657, 1194049457, 2296999457, 2566024457, 2810020457, 3108672457, 3328172457, 3633330457],
-                    borderColor: '#ff666e',
-                    backgroundColor: 'rgba(255, 102, 110, 0.1)',
-                    fill: true,
-                    tension: 0.1
-                }
-            ]
-        };
-        const cumulativeTrendCtx = document.getElementById('cumulativeTrendChart').getContext('2d');
-        new Chart(cumulativeTrendCtx, {
-            type: 'line',
-            data: cumulativeTrendData,
-            options: defaultChartOptions
-        });
-
-        const sewageDebtData = {
-            labels: ['واحد ۱', 'واحد ۲', 'واحد ۳', 'واحد ۴', 'واحد ۶', 'واحد ۷', 'واحد ۸', 'واحد ۱۴', 'واحد ۱۶', 'واحد ۲۱', 'واحد ۲۳', 'واحد ۲۴', 'واحد ۳۰', 'واحد ۳۴', 'واحد ۳۵', 'واحد ۳۶'],
-            datasets: [{
-                label: 'بدهی قسط فاضلاب',
-                data: [6590000, 6590000, 6590000, 6590000, 6590000, 6590000, 13180000, 6590000, 6590000, 6590000, 6590000, 6590000, 6590000, 6590000, 6590000, 6590000],
-                backgroundColor: '#d34b97',
-                borderRadius: 5,
-                borderWidth: 0
-            }]
-        };
-        
-        const sewageChartContainer = document.getElementById('sewage-chart-container');
-        sewageChartContainer.style.height = `${sewageDebtData.labels.length * 28}px`;
-
-
-        const sewageDebtCtx = document.getElementById('sewageDebtChart').getContext('2d');
-        new Chart(sewageDebtCtx, {
-            type: 'bar',
-            data: sewageDebtData,
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                layout: {
-                    padding: {
-                        right: 70 
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            title: tooltipTitleCallback,
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) { label += ': '; }
-                                if (context.parsed.x !== null) {
-                                    label += context.parsed.x.toLocaleString('fa-IR') + ' ریال';
-                                }
-                                return label;
-                            }
+                            label: tooltipLabelCallback
                         },
                         bodyFont: { family: 'Vazirmatn' },
                         titleFont: { family: 'Vazirmatn' },
                         rtl: true,
                     },
                     legend: {
-                       display: false
+                        labels: {
+                            font: {
+                                family: 'Vazirmatn',
+                                size: 12
+                            }
+                        }
                     },
                     datalabels: {
-                        formatter: (value) => {
-                            if (value > 0) {
-                                return value.toLocaleString('fa-IR');
-                            }
-                           return '';
-                        },
-                        color: '#333',
-                        font: {
-                            size: 9,
-                            weight: 'bold',
-                            family: 'Vazirmatn'
-                        },
-                        anchor: 'end',
-                        align: 'start',
-                        offset: 8
+                       display: false 
                     }
                 },
                 scales: {
-                    x: {
+                    y: {
                         ticks: {
                             callback: function(value) {
-                                return (value / 1000000).toLocaleString('fa-IR') + 'م';
+                                 if (value >= 1.0e9) {
+                                    return (value / 1.0e9).toFixed(1) + 'میلیارد';
+                                }
+                                if (value >= 1.0e6) {
+                                    return (value / 1.0e6).toFixed(0) + 'میلیون';
+                                }
+                                return value.toLocaleString('fa-IR');
                             },
                             font: { family: 'Vazirmatn' }
                         },
-                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
                     },
-                    y: {
-                        ticks: { font: { family: 'Vazirmatn', size: 10 } },
-                        grid: { display: false }
+                    x: {
+                        ticks: {
+                            font: { family: 'Vazirmatn', size: 10 }
+                        },
+                         grid: {
+                            display: false
+                        }
                     }
                 }
-            }
-        });
-
-        const tableRawData = [
-            { unit: 'واحد ۱', name: 'عطری', status: 'مالک', charge1403: 42000000, charge1404: 0, installment: 92320000 },
-            { unit: 'واحد ۲', name: 'عطری', status: 'مستاجر', charge1403: 70000000, charge1404: 48000000, installment: 92320000 },
-            { unit: 'واحد ۳', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 92320000 },
-            { unit: 'واحد ۴', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 92320000 },
-            { unit: 'واحد ۵', name: 'قملاقی', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
-            { unit: 'واحد ۶', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 40000000, installment: 92320000 },
-            { unit: 'واحد ۷', name: 'نیک', status: 'مالک', charge1403: 84000000, charge1404: 32000000, installment: 92320000 },
-            { unit: 'واحد ۸', name: 'بوذری', status: 'مالک', charge1403: 24000000, charge1404: 0, installment: 85730000 },
-            { unit: 'واحد ۹', name: 'میرزایی (و ۹)', status: 'مستاجر', charge1403: 84000000, charge1404: 40000000, installment: 98910000 },
-            { unit: 'واحد ۱۰', name: 'پاک نژاد', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 105500000 },
-            { unit: 'واحد ۱۱', name: 'قاضی سعیدی', status: 'مالک', charge1403: 84000000, charge1404: 40000000, installment: 112090000 },
-            { unit: 'واحد ۱۲', name: 'متقیان', status: 'مالک', charge1403: 84000000, charge1404: 40000000, installment: 105500000 },
-            { unit: 'واحد ۱۳', name: 'مهدویان', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
-            { unit: 'واحد ۱۴', name: 'عطری', status: 'مستاجر', charge1403: 75000000, charge1404: 32000000, installment: 92320000 },
-            { unit: 'واحد ۱۵', name: 'بابازده', status: 'مستاجر', charge1403: 60000000, charge1404: 28000000, installment: 98910000 },
-            { unit: 'واحد ۱۶', name: 'مزجی', status: 'مالک', charge1403: 84000000, charge1404: 40000000, installment: 92320000 },
-            { unit: 'واحد ۱۷', name: 'بهبودی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
-            { unit: 'واحد ۱۸', name: 'علمداری', status: 'مستاجر', charge1403: 68000000, charge1404: 0, installment: 98910000 },
-            { unit: 'واحد ۱۹', name: 'شعبانی', status: 'مالک', charge1403: 84000000, charge1404: 40000000, installment: 98910000 },
-            { unit: 'واحد ۲۰', name: 'مرادی', status: 'مالک', charge1403: 84000000, charge1404: 0, installment: 105500000 },
-            { unit: 'واحد ۲۱', name: 'میرزایی', status: 'مالک', charge1403: 64530000, charge1404: 0, installment: 92320000 },
-            { unit: 'واحد ۲۲', name: 'اعطاسی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
-            { unit: 'واحد ۲۳', name: 'میرزایی', status: 'مستاجر', charge1403: 84000000, charge1404: 0, installment: 92320000 },
-            { unit: 'واحد ۲۴', name: 'شجایی', status: 'مالک', charge1403: 84000000, charge1404: 32000000, installment: 92320000 },
-            { unit: 'واحد ۲۵', name: 'رفیعی', status: 'مالک', charge1403: 0, charge1404: 32000000, installment: 98910000 },
-            { unit: 'واحد ۲۶', name: 'عباسی', status: 'مستاجر', charge1403: 84000000, charge1404: 40000000, installment: 105500000 },
-            { unit: 'واحد ۲۷', name: 'بیات', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 105500000 },
-            { unit: 'واحد ۲۸', name: 'شجاعی', status: 'مالک', charge1403: 84000000, charge1404: 32000000, installment: 105500000 },
-            { unit: 'واحد ۲۹', name: 'عدولی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
-            { unit: 'واحد ۳۰', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 0, installment: 92320000 },
-            { unit: 'واحد ۳۱', name: 'ساجدی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
-            { unit: 'واحد ۳۲', name: 'دیلمقانیان', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 105500000 },
-            { unit: 'واحد ۳۳', name: 'کاظمی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
-            { unit: 'واحد ۳۴', name: 'عطری', status: 'مالک', charge1403: 42000000, charge1404: 0, installment: 92320000 },
-            { unit: 'واحد ۳۵', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 0, installment: 92320000 },
-            { unit: 'واحد ۳۶', name: 'عطری', status: 'مالک', charge1403: 0, charge1404: 0, installment: 92320000 },
-        ];
-        
-        const charge1403Baseline = 84000000;
-        const charge1404Baseline = 48000000;
-        const installmentBaseline = 98910000;
-
-        const allUnitsData = tableRawData.map(item => {
-            const debt1403 = charge1403Baseline - item.charge1403;
-            const debt1404 = charge1404Baseline - item.charge1404;
-            const installmentBalance = item.installment - installmentBaseline;
-            const totalUnitDebt = debt1403 + debt1404 - installmentBalance;
-            
-            return { 
-                unit: item.unit, 
-                owner: item.name, 
-                status: item.status, 
-                debt1403: debt1403, 
-                debt1404: debt1404, 
-                sewageDebt: -installmentBalance, 
-                totalUnitDebt: totalUnitDebt 
             };
-        });
 
-        // --- Populate KPIs ---
-        const totalIncome = 3721530000;
-        const totalExpense = 3633330457;
-        const netBalance = totalIncome - totalExpense;
-        const totalChargeDebt = allUnitsData.reduce((sum, unit) => sum + unit.debt1403 + unit.debt1404, 0);
+            const expenseData = {
+                labels: ['حقوق و نگهداری', 'هزینه های تاسیسات', 'قبوض خدماتی', 'هزینه های عمرانی', 'متفرقه'],
+                datasets: [{
+                    label: 'هزینه',
+                    data: [1418900000, 1094860200, 620650800, 316000000, 182919457],
+                    backgroundColor: ['#003f5c', '#7a5195', '#d34b97', '#ff666e', '#ffa600'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            };
 
-        document.getElementById('total-income').textContent = totalIncome.toLocaleString('fa-IR');
-        document.getElementById('total-expense').textContent = totalExpense.toLocaleString('fa-IR');
-        document.getElementById('net-balance').textContent = netBalance.toLocaleString('fa-IR');
-        document.getElementById('total-debt').textContent = totalChargeDebt.toLocaleString('fa-IR');
-        document.getElementById('total-debt-label').textContent = 'کل بدهی شارژ (۱۴۰۳ و ۱۴۰۴)';
-
-
-        const tableBody = document.getElementById('details-table-body');
-        let totalDebt1403 = 0, totalDebt1404 = 0, totalSewageDebt = 0, grandTotalDebt = 0;
-        allUnitsData.forEach(unit => {
-            totalDebt1403 += unit.debt1403;
-            totalDebt1404 += unit.debt1404;
-            totalSewageDebt += unit.sewageDebt;
-            grandTotalDebt += unit.totalUnitDebt;
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-gray-50';
-            row.innerHTML = `
-                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${unit.unit}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${unit.owner}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${unit.status}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatRialForTable(unit.debt1403, 'pure_debt')}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatRialForTable(unit.debt1404, 'pure_debt')}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatRialForTable(unit.sewageDebt)}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-800">${formatRialForTable(unit.totalUnitDebt)}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        document.getElementById('total-debt-1403').innerHTML = formatRialForTable(totalDebt1403, 'pure_debt');
-        document.getElementById('total-debt-1404').innerHTML = formatRialForTable(totalDebt1404, 'pure_debt');
-        document.getElementById('total-sewage-debt-col').innerHTML = formatRialForTable(totalSewageDebt);
-        document.getElementById('total-debt-all').innerHTML = formatRialForTable(grandTotalDebt);
-        
-        const ownerDebts = allUnitsData.reduce((acc, unit) => {
-            const ownerName = unit.owner;
-            if (!acc[ownerName]) {
-                acc[ownerName] = { totalDebt: 0, units: [] };
-            }
-            acc[ownerName].totalDebt += unit.debt1403 + unit.debt1404;
-            acc[ownerName].units.push(unit.unit.replace('واحد ', ''));
-            return acc;
-        }, {});
-
-        const sortedOwners = Object.entries(ownerDebts)
-            .map(([name, data]) => ({ name, ...data }))
-            .filter(owner => owner.totalDebt > 0)
-            .sort((a, b) => b.totalDebt - a.totalDebt);
-            
-        const topDebtorsListElement = document.getElementById('top-debtors-list');
-        topDebtorsListElement.innerHTML = ''; // Clear previous list
-        sortedOwners.slice(0, 7).forEach(owner => {
-            const listItem = document.createElement('li');
-            listItem.className = 'flex justify-between items-center py-3 px-2';
-            const unitText = `(واحدها: ${owner.units.join(', ')})`;
-            listItem.innerHTML = `<span class="font-semibold text-gray-800">${owner.name} <span class="text-xs text-gray-500">${unitText}</span></span><span class="font-bold text-red-500">${owner.totalDebt.toLocaleString('fa-IR')} ریال</span>`;
-            topDebtorsListElement.appendChild(listItem);
-        });
-
-        const toggleButton = document.getElementById('toggle-details-table');
-        const tableContainer = document.getElementById('details-table-container');
-        const toggleIcon = document.getElementById('toggle-icon');
-        toggleButton.addEventListener('click', () => {
-            if (tableContainer.style.maxHeight) {
-                tableContainer.style.maxHeight = null;
-                toggleIcon.style.transform = 'rotate(0deg)';
-            } else {
-                tableContainer.style.maxHeight = tableContainer.scrollHeight + "px";
-                toggleIcon.style.transform = 'rotate(45deg)';
-            }
-        });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
+            const expenseDoughnutCtx = document.getElementById('expenseDoughnutChart').getContext('2d');
+            new Chart(expenseDoughnutCtx, {
+                type: 'doughnut',
+                data: expenseData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: tooltipTitleCallback,
+                                label: (context) => {
+                                    let value = context.parsed;
+                                    let total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    let percentage = (value / total * 100).toFixed(1);
+                                    return `${value.toLocaleString('fa-IR')} ریال (${percentage}%)`;
+                                }
+                            },
+                             bodyFont: { family: 'Vazirmatn' },
+                             titleFont: { family: 'Vazirmatn' },
+                             rtl: true,
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { family: 'Vazirmatn', size: 11 },
+                                boxWidth: 15
+                            }
+                        },
+                        datalabels: {
+                            display: false
+                        }
+                    }
                 }
             });
-        }, {
-            threshold: 0.1
+            
+            const cumulativeTrendData = {
+                labels: ['فروردین ۰۳', 'اردیبهشت ۰۳', 'خرداد ۰۳', 'تیر ۰۳', 'مرداد ۰۳', 'شهریور ۰۳', 'مهر ۰۳', 'آبان ۰۳', 'آذر ۰۳', 'دی ۰۳', 'بهمن ۰۳', 'اسفند ۰۳', 'فروردین ۰۴', 'اردیبهشت ۰۴', 'خرداد ۰۴', 'تیر ۰۴', 'مرداد ۰۴', 'شهریور ۰۴'],
+                datasets: [
+                    {
+                        label: 'درآمد تجمعی',
+                        data: [198000000, 399000000, 603000000, 807000000, 999000000, 1185000000, 1435000000, 1681000000, 1927000000, 2169530000, 2399530000, 2629530000, 2827530000, 3025530000, 3233530000, 3441530000, 3609530000, 3721530000],
+                        borderColor: '#003f5c',
+                        backgroundColor: 'rgba(0, 63, 92, 0.1)',
+                        fill: true,
+                        tension: 0.1
+                    },
+                    {
+                        label: 'هزینه تجمعی',
+                        data: [0, 0, 0, 76715000, 181385000, 266085000, 350613200, 465086657, 722209657, 946663657, 1038928657, 1194049457, 2296999457, 2566024457, 2810020457, 3108672457, 3328172457, 3633330457],
+                        borderColor: '#ff666e',
+                        backgroundColor: 'rgba(255, 102, 110, 0.1)',
+                        fill: true,
+                        tension: 0.1
+                    }
+                ]
+            };
+            const cumulativeTrendCtx = document.getElementById('cumulativeTrendChart').getContext('2d');
+            new Chart(cumulativeTrendCtx, {
+                type: 'line',
+                data: cumulativeTrendData,
+                options: defaultChartOptions
+            });
+
+            const tableRawData = [
+                { unit: 'واحد ۱', name: 'عطری', status: 'مالک', charge1403: 42000000, charge1404: 0, installment: 92320000 },
+                { unit: 'واحد ۲', name: 'عطری', status: 'مستاجر', charge1403: 70000000, charge1404: 48000000, installment: 92320000 },
+                { unit: 'واحد ۳', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 92320000 },
+                { unit: 'واحد ۴', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 92320000 },
+                { unit: 'واحد ۵', name: 'قملاقی', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
+                { unit: 'واحد ۶', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 92320000 },
+                { unit: 'واحد ۷', name: 'نیک', status: 'مالک', charge1403: 84000000, charge1404: 32000000, installment: 92320000 },
+                { unit: 'واحد ۸', name: 'بوذری', status: 'مالک', charge1403: 24000000, charge1404: 0, installment: 92320000 },
+                { unit: 'واحد ۹', name: 'میرزایی (و ۹)', status: 'مستاجر', charge1403: 84000000, charge1404: 40000000, installment: 105500000 },
+                { unit: 'واحد ۱۰', name: 'پاک نژاد', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 105500000 },
+                { unit: 'واحد ۱۱', name: 'قاضی سعیدی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 112090000 },
+                { unit: 'واحد ۱۲', name: 'متقیان', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 112090000 },
+                { unit: 'واحد ۱۳', name: 'مهدویان', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
+                { unit: 'واحد ۱۴', name: 'عطری', status: 'مستاجر', charge1403: 75000000, charge1404: 32000000, installment: 92320000 },
+                { unit: 'واحد ۱۵', name: 'بابازده', status: 'مستاجر', charge1403: 60000000, charge1404: 20000000, installment: 98910000 },
+                { unit: 'واحد ۱۶', name: 'مزجی', status: 'مالک', charge1403: 84000000, charge1404: 40000000, installment: 92320000 },
+                { unit: 'واحد ۱۷', name: 'بهبودی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
+                { unit: 'واحد ۱۸', name: 'علمداری', status: 'مستاجر', charge1403: 68000000, charge1404: 0, installment: 98910000 },
+                { unit: 'واحد ۱۹', name: 'شعبانی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
+                { unit: 'واحد ۲۰', name: 'مرادی', status: 'مالک', charge1403: 84000000, charge1404: 16000000, installment: 105500000 },
+                { unit: 'واحد ۲۱', name: 'میرزایی', status: 'مالک', charge1403: 64530000, charge1404: 0, installment: 92320000 },
+                { unit: 'واحد ۲۲', name: 'اعطاسی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
+                { unit: 'واحد ۲۳', name: 'میرزایی', status: 'مستاجر', charge1403: 84000000, charge1404: 0, installment: 92320000 },
+                { unit: 'واحد ۲۴', name: 'شجایی', status: 'مالک', charge1403: 84000000, charge1404: 24000000, installment: 92320000 },
+                { unit: 'واحد ۲۵', name: 'رفیعی', status: 'مالک', charge1403: 0, charge1404: 32000000, installment: 105500000 },
+                { unit: 'واحد ۲۶', name: 'عباسی', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 105500000 },
+                { unit: 'واحد ۲۷', name: 'بیات', status: 'مستاجر', charge1403: 84000000, charge1404: 48000000, installment: 105500000 },
+                { unit: 'واحد ۲۸', name: 'شجاعی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 112090000 },
+                { unit: 'واحد ۲۹', name: 'عدولی', status: 'مالک', charge1403: 84000000, charge1404: 40000000, installment: 98910000 },
+                { unit: 'واحد ۳۰', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 0, installment: 92320000 },
+                { unit: 'واحد ۳۱', name: 'ساجدی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
+                { unit: 'واحد ۳۲', name: 'دیلمقانیان', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 105500000 },
+                { unit: 'واحد ۳۳', name: 'کاظمی', status: 'مالک', charge1403: 84000000, charge1404: 48000000, installment: 98910000 },
+                { unit: 'واحد ۳۴', name: 'عطری', status: 'مالک', charge1403: 42000000, charge1404: 0, installment: 92320000 },
+                { unit: 'واحد ۳۵', name: 'عطری', status: 'مستاجر', charge1403: 84000000, charge1404: 0, installment: 92320000 },
+                { unit: 'واحد ۳۶', name: 'عطری', status: 'مالک', charge1403: 0, charge1404: 0, installment: 92320000 },
+            ];
+            
+            const charge1403Baseline = 84000000;
+            const charge1404Baseline = 48000000; // 6 months * 8,000,000
+            const installmentBaseline = 98910000; // پیش پرداخت + ۹ قسط
+            const installmentTotalCommitment = 105500000; // پیش پرداخت + ۱۰ قسط
+
+            const allUnitsData = tableRawData.map(item => {
+                const debt1403 = charge1403Baseline - item.charge1403;
+                const debt1404 = charge1404Baseline - item.charge1404;
+                const installmentBalance = item.installment - installmentBaseline; // Based on 9 installments
+                const sewageDebtNew = installmentTotalCommitment - item.installment;
+                const totalUnitChargeDebt = debt1403 + debt1404;
+                
+                return { 
+                    unit: item.unit, 
+                    owner: item.name, 
+                    status: item.status, 
+                    debt1403: debt1403 > 0 ? debt1403 : 0,
+                    debt1404: debt1404 > 0 ? debt1404 : 0, 
+                    sewageBalance: -installmentBalance,
+                    sewageDebt: sewageDebtNew > 0 ? sewageDebtNew : 0,
+                    totalUnitChargeDebt: totalUnitChargeDebt > 0 ? totalUnitChargeDebt : 0
+                };
+            });
+
+            // --- Update KPIs ---
+            const totalIncome1403 = 2629530000;
+            const income1404 = tableRawData.reduce((sum, unit) => sum + unit.charge1404, 0);
+            const totalIncome = totalIncome1403 + income1404;
+            const totalExpense = 3633330457;
+            const netBalance = totalIncome - totalExpense;
+            const totalChargeDebt = allUnitsData.reduce((sum, unit) => sum + unit.totalUnitChargeDebt, 0);
+
+            document.getElementById('total-income').textContent = totalIncome.toLocaleString('fa-IR');
+            document.getElementById('total-expense').textContent = totalExpense.toLocaleString('fa-IR');
+            document.getElementById('net-balance').textContent = netBalance.toLocaleString('fa-IR');
+            document.getElementById('total-debt').textContent = totalChargeDebt.toLocaleString('fa-IR');
+            document.getElementById('total-debt-label').textContent = 'کل بدهی شارژ (۱۴۰۳ و ۱۴۰۴)';
+            document.getElementById('total-charge-debt-text').textContent = totalChargeDebt.toLocaleString('fa-IR');
+            
+            // Update 1404 bilan
+            document.getElementById('income-1404').textContent = income1404.toLocaleString('fa-IR');
+            const balance1404 = income1404 - 2439281000;
+            document.getElementById('balance-1404').innerHTML = balance1404 < 0 ? `(${Math.abs(balance1404).toLocaleString('fa-IR')})` : balance1404.toLocaleString('fa-IR');
+
+
+            const tableBody = document.getElementById('details-table-body');
+            tableBody.innerHTML = '';
+            let totalDebt1403 = 0, totalDebt1404 = 0, totalSewageBalance = 0, grandTotalChargeDebt = 0;
+            allUnitsData.forEach(unit => {
+                totalDebt1403 += unit.debt1403;
+                totalDebt1404 += unit.debt1404;
+                totalSewageBalance += unit.sewageBalance;
+                grandTotalChargeDebt += unit.totalUnitChargeDebt;
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${unit.unit}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${unit.owner}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${unit.status}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatRialForTable(unit.debt1403, 'pure_debt')}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatRialForTable(unit.debt1404, 'pure_debt')}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${formatRialForTable(unit.sewageBalance)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-800">${formatRialForTable(unit.totalUnitChargeDebt, 'pure_debt')}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById('total-debt-1403').innerHTML = formatRialForTable(totalDebt1403, 'pure_debt');
+            document.getElementById('total-debt-1404').innerHTML = formatRialForTable(totalDebt1404, 'pure_debt');
+            document.getElementById('total-sewage-debt-col').innerHTML = formatRialForTable(totalSewageBalance);
+            document.getElementById('total-debt-all').innerHTML = formatRialForTable(grandTotalChargeDebt, 'pure_debt');
+            
+            const ownerDebts = allUnitsData.reduce((acc, unit) => {
+                const ownerName = unit.owner;
+                if (!acc[ownerName]) {
+                    acc[ownerName] = { totalDebt: 0, units: [] };
+                }
+                acc[ownerName].totalDebt += unit.totalUnitChargeDebt;
+                acc[ownerName].units.push(unit.unit.replace('واحد ', ''));
+                return acc;
+            }, {});
+
+            const sortedOwners = Object.entries(ownerDebts)
+                .map(([name, data]) => ({ name, ...data }))
+                .filter(owner => owner.totalDebt > 0)
+                .sort((a, b) => b.totalDebt - a.totalDebt);
+                
+            const topDebtorsListElement = document.getElementById('top-debtors-list');
+            topDebtorsListElement.innerHTML = ''; 
+            sortedOwners.slice(0, 7).forEach(owner => {
+                const listItem = document.createElement('li');
+                listItem.className = 'flex justify-between items-center py-3 px-2';
+                const unitText = `(واحدها: ${owner.units.join(', ')})`;
+                listItem.innerHTML = `<span class="font-semibold text-gray-800">${owner.name} <span class="text-xs text-gray-500">${unitText}</span></span><span class="font-bold text-red-500">${owner.totalDebt.toLocaleString('fa-IR')} ریال</span>`;
+                topDebtorsListElement.appendChild(listItem);
+            });
+            
+            // --- DYNAMIC DEBT CHART ---
+            const indebtedUnits = allUnitsData.filter(u => u.totalUnitChargeDebt > 0);
+            const debtChartData = {
+                labels: indebtedUnits.map(u => u.unit),
+                datasets: [
+                    {
+                        label: 'بدهی سال ۱۴۰۳',
+                        data: indebtedUnits.map(u => u.debt1403),
+                        backgroundColor: '#003f5c',
+                        borderRadius: 5,
+                    },
+                    {
+                        label: 'بدهی سال ۱۴۰۴',
+                        data: indebtedUnits.map(u => u.debt1404),
+                        backgroundColor: '#7a5195',
+                        borderRadius: 5,
+                    }
+                ]
+            };
+            const debtChartContainer = document.getElementById('debt-chart-container');
+            debtChartContainer.style.height = `${indebtedUnits.length * 28}px`;
+            const debtBarCtx = document.getElementById('debtBarChart').getContext('2d');
+            new Chart(debtBarCtx, {
+                type: 'bar',
+                data: debtChartData,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                               title: tooltipTitleCallback,
+                               label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.x !== null) { label += context.parsed.x.toLocaleString('fa-IR') + ' ریال'; }
+                                    return label;
+                               },
+                               footer: function(tooltipItems) {
+                                    const dataIndex = tooltipItems[0].dataIndex;
+                                    let sum = 0;
+                                    tooltipItems[0].chart.data.datasets.forEach(dataset => {
+                                        sum += dataset.data[dataIndex];
+                                    });
+                                    return 'جمع کل شارژ: ' + sum.toLocaleString('fa-IR') + ' ریال';
+                               }
+                            },
+                             displayColors: true,
+                             bodyFont: { family: 'Vazirmatn' },
+                             titleFont: { family: 'Vazirmatn' },
+                             footerFont: { family: 'Vazirmatn', weight: 'bold', size: 12 },
+                             rtl: true,
+                        },
+                        legend: {
+                           display: true,
+                           position: 'top',
+                           labels: { font: { family: 'Vazirmatn', size: 12 } }
+                        },
+                        datalabels: {
+                            display: true,
+                            formatter: (value) => {
+                               if (value === 0) return '';
+                               const millions = value / 1000000;
+                               return millions % 1 === 0 ? millions.toLocaleString('fa-IR') : millions.toFixed(1).replace('.', '/').toLocaleString('fa-IR');
+                            },
+                            color: 'white',
+                            font: { weight: 'bold', family: 'Vazirmatn', size: 9 },
+                         }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { font: { family: 'Vazirmatn', size: 9 } },
+                            grid: { display: false },
+                            stacked: true,
+                        },
+                        x: {
+                            ticks: { 
+                                callback: function(value) { return (value / 1000000).toLocaleString('fa-IR'); },
+                                font: { family: 'Vazirmatn' } 
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'میلیون ریال',
+                                font: { family: 'Vazirmatn', size: 12, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- DYNAMIC SEWAGE CHART ---
+            const sewageCollected = tableRawData.reduce((sum, unit) => sum + unit.installment, 0);
+            const sewageTotalDebt = allUnitsData.reduce((sum, unit) => sum + unit.sewageDebt, 0);
+            document.getElementById('sewage-collected').textContent = sewageCollected.toLocaleString('fa-IR');
+            document.getElementById('sewage-debt-total').textContent = sewageTotalDebt.toLocaleString('fa-IR');
+            
+            const sewageDebtors = allUnitsData.filter(u => u.sewageDebt > 0);
+            const sewageDebtChartData = {
+                labels: sewageDebtors.map(u => u.unit),
+                datasets: [{
+                    label: 'بدهی قسط فاضلاب',
+                    data: sewageDebtors.map(u => u.sewageDebt),
+                    backgroundColor: '#d34b97',
+                    borderRadius: 5,
+                    borderWidth: 0
+                }]
+            };
+            const sewageChartContainer = document.getElementById('sewage-chart-container');
+            sewageChartContainer.style.height = `${sewageDebtors.length * 30}px`;
+            const sewageDebtCtx = document.getElementById('sewageDebtChart').getContext('2d');
+            new Chart(sewageDebtCtx, {
+                type: 'bar',
+                data: sewageDebtChartData,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: { right: 70 } },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: tooltipTitleCallback,
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.x !== null) { label += context.parsed.x.toLocaleString('fa-IR') + ' ریال'; }
+                                    return label;
+                                }
+                            },
+                            bodyFont: { family: 'Vazirmatn' },
+                            titleFont: { family: 'Vazirmatn' },
+                            rtl: true,
+                        },
+                        legend: { display: false },
+                        datalabels: {
+                            formatter: (value) => value > 0 ? value.toLocaleString('fa-IR') : '',
+                            color: '#333',
+                            font: { size: 9, weight: 'bold', family: 'Vazirmatn' },
+                            anchor: 'end',
+                            align: 'start',
+                            offset: 8
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                callback: function(value) { return (value / 1000000).toLocaleString('fa-IR') + 'م'; },
+                                font: { family: 'Vazirmatn' }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        y: {
+                            ticks: { font: { family: 'Vazirmatn', size: 10 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+
+            const toggleButton = document.getElementById('toggle-details-table');
+            const tableContainer = document.getElementById('details-table-container');
+            const toggleIcon = document.getElementById('toggle-icon');
+            toggleButton.addEventListener('click', () => {
+                if (tableContainer.style.maxHeight) {
+                    tableContainer.style.maxHeight = null;
+                    toggleIcon.style.transform = 'rotate(0deg)';
+                } else {
+                    tableContainer.style.maxHeight = tableContainer.scrollHeight + "px";
+                    toggleIcon.style.transform = 'rotate(45deg)';
+                }
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
+            elementsToAnimate.forEach(el => observer.observe(el));
         });
-
-        const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
-        elementsToAnimate.forEach(el => observer.observe(el));
-
-
     </script>
 </body>
 </html>
-
 
