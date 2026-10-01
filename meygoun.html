@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گزارش و بیلان مالی ساختمان میگون - تا پایان شهریور</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f8fafc;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .chart-box {
+            position: relative;
+            width: 100%;
+            height: 380px;
+        }
+        .kpi-card {
+            transition: all 0.25s ease-in-out;
+        }
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.12);
+        }
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+        .custom-scroll::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-500/20 text-lg">
+                        🏔️
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-slate-900 text-base sm:text-lg">داشبورد مالی ساختمان میگون</h1>
+                        <p class="text-xs text-slate-500">گزارش تجمعی مانده حساب‌ها تا پایان شهریور ماه</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        ۹ واحد فعال
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+
+        <!-- Header Hero Section -->
+        <header class="bg-gradient-to-r from-slate-900 via-slate-800 to-teal-950 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+            <div class="absolute -left-10 -bottom-10 opacity-10 text-[180px] font-black select-none pointer-events-none">
+                MEYGOON
+            </div>
+            <div class="relative z-10 max-w-3xl space-y-3">
+                <span class="px-3 py-1 bg-white/10 text-emerald-300 text-xs font-semibold rounded-lg tracking-wide uppercase">
+                    گزارش تفکیکی مطالبات
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight">
+                    وضعیت مانده بدهی شارژ معمولی و فوق‌العاده
+                </h2>
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                    بررسی مانده حساب ۹ واحد ساختمان میگون شامل بدهی‌های انباشته شارژ ماهانه جاری و صندوق شارژ فوق‌العاده پروژه‌ای تا منتهی به پایان شهریور.
+                </p>
+            </div>
+        </header>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- Total Regular Charge Debt -->
+            <div class="kpi-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold text-slate-400">شارژ معمولی معوق</span>
+                    <span class="p-2 bg-amber-50 rounded-xl text-amber-600 text-base">📋</span>
+                </div>
+                <div class="mt-4">
+                    <div class="text-2xl sm:text-3xl font-black text-amber-600 tracking-tight" id="kpi-regular-toman">--</div>
+                    <div class="text-xs text-slate-400 mt-1 font-medium" id="kpi-regular-rial">-- ریال</div>
+                </div>
+                <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                    <span>میانگین هر واحد</span>
+                    <span class="font-bold text-slate-700" id="kpi-avg-regular">--</span>
+                </div>
+            </div>
+
+            <!-- Total Special Charge Debt -->
+            <div class="kpi-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold text-slate-400">شارژ فوق‌العاده</span>
+                    <span class="p-2 bg-rose-50 rounded-xl text-rose-600 text-base">⚡</span>
+                </div>
+                <div class="mt-4">
+                    <div class="text-2xl sm:text-3xl font-black text-rose-600 tracking-tight" id="kpi-special-toman">--</div>
+                    <div class="text-xs text-slate-400 mt-1 font-medium" id="kpi-special-rial">-- ریال</div>
+                </div>
+                <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                    <span>واحدهای بدهکار</span>
+                    <span class="font-bold text-slate-700" id="kpi-special-count">--</span>
+                </div>
+            </div>
+
+            <!-- Grand Total Debt -->
+            <div class="kpi-card bg-gradient-to-br from-emerald-600 to-teal-700 text-white p-6 rounded-2xl shadow-md shadow-emerald-700/20 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold text-emerald-100">مجموع کل بدهی معوق</span>
+                    <span class="p-2 bg-white/10 rounded-xl text-white text-base">💰</span>
+                </div>
+                <div class="mt-4">
+                    <div class="text-2xl sm:text-3xl font-black tracking-tight" id="kpi-total-toman">--</div>
+                    <div class="text-xs text-emerald-200 mt-1 font-medium" id="kpi-total-rial">-- ریال</div>
+                </div>
+                <div class="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-emerald-100">
+                    <span>بالاترین بدهی واحد</span>
+                    <span class="font-bold text-white" id="kpi-max-unit">--</span>
+                </div>
+            </div>
+
+            <!-- Quick Status Ratio -->
+            <div class="kpi-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold text-slate-400">ترکیب بدهی‌ها</span>
+                    <span class="p-2 bg-indigo-50 rounded-xl text-indigo-600 text-base">📊</span>
+                </div>
+                <div class="mt-4 space-y-2">
+                    <div class="flex justify-between text-xs font-semibold text-slate-600">
+                        <span>فوق‌العاده</span>
+                        <span id="kpi-special-share">--٪</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden flex">
+                        <div id="kpi-bar-special" class="bg-rose-500 h-2.5 transition-all duration-500" style="width: 0%"></div>
+                        <div id="kpi-bar-regular" class="bg-amber-500 h-2.5 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs font-semibold text-slate-600">
+                        <span>معمولی</span>
+                        <span id="kpi-regular-share">--٪</span>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                    <span>تسویه‌شده فوق‌العاده</span>
+                    <span class="font-bold text-emerald-600">واحد ۹ (رستمی)</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Stacked Debt Comparison Chart -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">تفکیک مانده بدهی هر واحد به تفکیک نوع شارژ</h3>
+                        <p class="text-xs text-slate-500">برای مشاهده جمع کل و جزئیات، روی هر ستون نشانگر را قرار دهید</p>
+                    </div>
+                    <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg w-fit">
+                        واحد: هزار تومان
+                    </span>
+                </div>
+                <div class="chart-box">
+                    <canvas id="debtStackedChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Share Distribution Doughnut Chart -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4 flex flex-col justify-between">
+                <div class="border-b border-slate-100 pb-4">
+                    <h3 class="text-lg font-bold text-slate-900">سهم بدهی کل بر اساس مالکین</h3>
+                    <p class="text-xs text-slate-500">توزیع درصد مطالبات معوق در بین ۹ واحد ساختمان</p>
+                </div>
+                <div class="chart-box !h-[300px]">
+                    <canvas id="ownersShareChart"></canvas>
+                </div>
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-600 text-center leading-relaxed">
+                    💡 بیشترین تعهد معوق مربوط به <span class="font-bold text-slate-800">آقای ادیب (واحد ۳)</span> با مبلغ ۱۹ میلیون تومان است.
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-6">
+            <details open class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 group transition-all duration-300">
+                <summary class="flex items-center justify-between cursor-pointer select-none">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-sm">
+                            📋
+                        </span>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">جدول یکپارچه و تفصیلی بدهی‌ها (۹ واحد)</h3>
+                            <p class="text-xs text-slate-500">ارقام هم بر حسب تومان و هم ریال برای شفافیت کامل درج شده است</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-teal-600 font-semibold group-open:hidden">نمایش جدول</span>
+                        <span class="text-xs text-slate-400 font-semibold hidden group-open:inline">بستن جدول</span>
+                        <span class="text-slate-400 group-open:rotate-180 transition-transform duration-300 text-lg">▼</span>
+                    </div>
+                </summary>
+
+                <div class="mt-6 overflow-x-auto custom-scroll">
+                    <table class="min-w-full divide-y divide-slate-200 text-right">
+                        <thead>
+                            <tr class="bg-slate-50/80 text-slate-600 text-xs font-bold">
+                                <th class="py-3.5 px-4 rounded-r-xl">شماره واحد</th>
+                                <th class="py-3.5 px-4">نام مالک</th>
+                                <th class="py-3.5 px-4">شارژ معمولی (تومان)</th>
+                                <th class="py-3.5 px-4">شارژ فوق‌العاده (تومان)</th>
+                                <th class="py-3.5 px-4 text-emerald-700">مجموع مانده بدهی (تومان)</th>
+                                <th class="py-3.5 px-4 rounded-l-xl text-slate-400 font-normal">معادل به ریال</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financial-table-body" class="divide-y divide-slate-100 text-sm">
+                            <!-- Dynamic Table Rows -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-slate-900 text-white font-extrabold text-sm" id="financial-table-foot">
+                                <!-- Dynamic Table Footer -->
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </details>
+
+            <!-- Dual Comparative Tables (Regular vs Special) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Table 1: Regular Charges -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                            <h4 class="font-bold text-slate-900 text-base">جدول ۱: مانده شارژ معمولی</h4>
+                        </div>
+                        <span class="text-xs text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md font-bold">هزینه‌های جاری</span>
+                    </div>
+                    <div class="overflow-x-auto custom-scroll">
+                        <table class="w-full text-right text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b border-slate-100 pb-2">
+                                    <th class="py-2.5">واحد</th>
+                                    <th class="py-2.5">مالک</th>
+                                    <th class="py-2.5 text-left">مانده (تومان)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="regular-table-body" class="divide-y divide-slate-100">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                            <tfoot>
+                                <tr class="font-bold text-amber-700 bg-amber-50/70 border-t border-amber-200">
+                                    <td class="py-2.5 px-2" colspan="2">جمع شارژ معمولی</td>
+                                    <td class="py-2.5 px-2 text-left" id="regular-table-sum">--</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table 2: Special Project Charges -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                            <h4 class="font-bold text-slate-900 text-base">جدول ۲: مانده شارژ فوق‌العاده</h4>
+                        </div>
+                        <span class="text-xs text-rose-700 bg-rose-50 px-2.5 py-1 rounded-md font-bold">پروژه‌های ساختمانی</span>
+                    </div>
+                    <div class="overflow-x-auto custom-scroll">
+                        <table class="w-full text-right text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b border-slate-100 pb-2">
+                                    <th class="py-2.5">واحد</th>
+                                    <th class="py-2.5">مالک</th>
+                                    <th class="py-2.5 text-left">مانده (تومان)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="special-table-body" class="divide-y divide-slate-100">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                            <tfoot>
+                                <tr class="font-bold text-rose-700 bg-rose-50/70 border-t border-rose-200">
+                                    <td class="py-2.5 px-2" colspan="2">جمع شارژ فوق‌العاده</td>
+                                    <td class="py-2.5 px-2 text-left" id="special-table-sum">--</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p>سیستم یکپارچه مدیریت مالی ساختمان میگون | دوره مالی تا پایان شهریور ماه</p>
+            <p class="text-slate-400 font-medium">طراحی و پیاده‌سازی حرفه‌ای بیلان مالی</p>
+        </div>
+    </footer>
+
+    <script>
+        // Data Store for Meygoon Building (9 Units)
+        // Amounts are normalized: regular in Thousand Tomans (4500 = 4,500,000 Tomans), special in Tomans (10,000,000)
+        const meygoonData = [
+            { unitId: 1, unitName: 'واحد ۱', owner: 'آقای ابویی', specialToman: 10000000, regularToman: 4500000 },
+            { unitId: 2, unitName: 'واحد ۲', owner: 'آقای ترقی', specialToman: 10000000, regularToman: 4000000 },
+            { unitId: 3, unitName: 'واحد ۳', owner: 'آقای ادیب', specialToman: 15000000, regularToman: 4000000 },
+            { unitId: 4, unitName: 'واحد ۴', owner: 'آقای خوان احمدی', specialToman: 10000000, regularToman: 4000000 },
+            { unitId: 5, unitName: 'واحد ۵', owner: 'آقای وثوقی', specialToman: 10000000, regularToman: 4000000 },
+            { unitId: 6, unitName: 'واحد ۶', owner: 'آقای حاج عباسی', specialToman: 10000000, regularToman: 4000000 },
+            { unitId: 7, unitName: 'واحد ۷', owner: 'آقای حاجی یخچالی', specialToman: 10000000, regularToman: 4000000 },
+            { unitId: 8, unitName: 'واحد ۸', owner: 'خانم همایونفر', specialToman: 10000000, regularToman: 4000000 },
+            { unitId: 9, unitName: 'واحد ۹', owner: 'آقای رستمی', specialToman: 0, regularToman: 9000000 }
+        ];
+
+        // Formatters
+        const toPersianNum = (n) => new Intl.NumberFormat('fa-IR').format(n);
+        const formatToman = (n) => toPersianNum(n) + ' تومان';
+        const formatRial = (n) => toPersianNum(n * 10) + ' ریال';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Chart.register(ChartDataLabels);
+            Chart.defaults.font.family = 'Vazirmatn';
+
+            // Calculations
+            const totalRegular = meygoonData.reduce((acc, u) => acc + u.regularToman, 0);
+            const totalSpecial = meygoonData.reduce((acc, u) => acc + u.specialToman, 0);
+            const grandTotal = totalRegular + totalSpecial;
+            const avgRegular = Math.round(totalRegular / meygoonData.length);
+            const specialDebtorsCount = meygoonData.filter(u => u.specialToman > 0).length;
+
+            const specialShare = Math.round((totalSpecial / grandTotal) * 100);
+            const regularShare = 100 - specialShare;
+
+            // Find unit with maximum total debt
+            const maxUnit = [...meygoonData].sort((a, b) => (b.regularToman + b.specialToman) - (a.regularToman + a.specialToman))[0];
+
+            document.getElementById('kpi-regular-toman').textContent = toPersianNum(totalRegular) + ' تومان';
+            document.getElementById('kpi-regular-rial').textContent = formatRial(totalRegular);
+            document.getElementById('kpi-avg-regular').textContent = toPersianNum(avgRegular) + ' تومان';
+
+            document.getElementById('kpi-special-toman').textContent = toPersianNum(totalSpecial) + ' تومان';
+            document.getElementById('kpi-special-rial').textContent = formatRial(totalSpecial);
+            document.getElementById('kpi-special-count').textContent = toPersianNum(specialDebtorsCount) + ' از ۹ واحد';
+
+            document.getElementById('kpi-total-toman').textContent = toPersianNum(grandTotal) + ' تومان';
+            document.getElementById('kpi-total-rial').textContent = formatRial(grandTotal);
+            document.getElementById('kpi-max-unit').textContent = `${maxUnit.owner} (${maxUnit.unitName})`;
+
+            document.getElementById('kpi-special-share').textContent = toPersianNum(specialShare) + '٪';
+            document.getElementById('kpi-regular-share').textContent = toPersianNum(regularShare) + '٪';
+            document.getElementById('kpi-bar-special').style.width = `${specialShare}%`;
+            document.getElementById('kpi-bar-regular').style.width = `${regularShare}%`;
+
+            const masterBody = document.getElementById('financial-table-body');
+            const regularBody = document.getElementById('regular-table-body');
+            const specialBody = document.getElementById('special-table-body');
+
+            meygoonData.forEach((item) => {
+                const unitTotal = item.regularToman + item.specialToman;
+
+                // Master Table Row
+                const masterRow = document.createElement('tr');
+                masterRow.className = 'hover:bg-slate-50 transition-colors font-medium';
+                masterRow.innerHTML = `
+                    <td class="py-3 px-4 font-bold text-slate-900">${item.unitName}</td>
+                    <td class="py-3 px-4 text-slate-700">${item.owner}</td>
+                    <td class="py-3 px-4 text-amber-600 font-bold">${toPersianNum(item.regularToman)}</td>
+                    <td class="py-3 px-4 text-rose-600 font-bold">${item.specialToman > 0 ? toPersianNum(item.specialToman) : '<span class="text-emerald-600 font-semibold">تسویه (۰)</span>'}</td>
+                    <td class="py-3 px-4 text-slate-900 font-black">${toPersianNum(unitTotal)} تومان</td>
+                    <td class="py-3 px-4 text-slate-400 text-xs font-mono">${toPersianNum(unitTotal * 10)}</td>
+                `;
+                masterBody.appendChild(masterRow);
+
+                // Regular Table Row
+                const regRow = document.createElement('tr');
+                regRow.className = 'hover:bg-slate-50';
+                regRow.innerHTML = `
+                    <td class="py-2.5 font-bold text-slate-800">${item.unitName}</td>
+                    <td class="py-2.5 text-slate-600">${item.owner}</td>
+                    <td class="py-2.5 text-left font-bold text-amber-600">${toPersianNum(item.regularToman)}</td>
+                `;
+                regularBody.appendChild(regRow);
+
+                // Special Table Row
+                const specRow = document.createElement('tr');
+                specRow.className = 'hover:bg-slate-50';
+                specRow.innerHTML = `
+                    <td class="py-2.5 font-bold text-slate-800">${item.unitName}</td>
+                    <td class="py-2.5 text-slate-600">${item.owner}</td>
+                    <td class="py-2.5 text-left font-bold ${item.specialToman > 0 ? 'text-rose-600' : 'text-emerald-600'}">
+                        ${item.specialToman > 0 ? toPersianNum(item.specialToman) : '۰ (تسویه)'}
+                    </td>
+                `;
+                specialBody.appendChild(specRow);
+            });
+
+            // Master Table Footer
+            const footRow = document.getElementById('financial-table-foot');
+            footRow.innerHTML = `
+                <td class="py-4 px-4 rounded-r-xl" colspan="2">جمع کل مطالبات ساختمان میگون</td>
+                <td class="py-4 px-4 text-amber-300 font-bold">${toPersianNum(totalRegular)}</td>
+                <td class="py-4 px-4 text-rose-300 font-bold">${toPersianNum(totalSpecial)}</td>
+                <td class="py-4 px-4 text-emerald-300 font-black">${toPersianNum(grandTotal)} تومان</td>
+                <td class="py-4 px-4 rounded-l-xl text-slate-300 text-xs">${toPersianNum(grandTotal * 10)} ریال</td>
+            `;
+
+            document.getElementById('regular-table-sum').textContent = toPersianNum(totalRegular) + ' تومان';
+            document.getElementById('special-table-sum').textContent = toPersianNum(totalSpecial) + ' تومان';
+
+            const ctxStacked = document.getElementById('debtStackedChart').getContext('2d');
+            new Chart(ctxStacked, {
+                type: 'bar',
+                data: {
+                    labels: meygoonData.map(d => `${d.unitName} (${d.owner})`),
+                    datasets: [
+                        {
+                            label: 'شارژ معمولی',
+                            data: meygoonData.map(d => d.regularToman / 1000), // in thousand tomans
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 6,
+                            borderSkipped: false
+                        },
+                        {
+                            label: 'شارژ فوق‌العاده',
+                            data: meygoonData.map(d => d.specialToman / 1000), // in thousand tomans
+                            backgroundColor: '#f43f5e',
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: {
+                                callback: (v) => toPersianNum(v) + ' هـ.ت',
+                                font: { size: 11 }
+                            },
+                            grid: { color: 'rgba(226, 232, 240, 0.7)' }
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                font: { weight: 'bold', size: 11 }
+                            },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                font: { size: 12, weight: 'bold' }
+                            }
+                        },
+                        datalabels: {
+                            display: false
+                        },
+                        tooltip: {
+                            rtl: true,
+                            callbacks: {
+                                title: (items) => items[0].label,
+                                label: (context) => {
+                                    const val = context.parsed.x * 1000;
+                                    return `${context.dataset.label}: ${toPersianNum(val)} تومان`;
+                                },
+                                footer: (tooltipItems) => {
+                                    let sum = 0;
+                                    tooltipItems.forEach(t => sum += (t.parsed.x * 1000));
+                                    return `جمع کل بدهی واحد: ${toPersianNum(sum)} تومان (${toPersianNum(sum * 10)} ریال)`;
+                                }
+                            },
+                            footerFont: { weight: 'bold' }
+                        }
+                    }
+                }
+            });
+
+            const ctxOwners = document.getElementById('ownersShareChart').getContext('2d');
+            const ownerTotals = meygoonData.map(d => d.regularToman + d.specialToman);
+            const palette = [
+                '#0d9488', '#0284c7', '#6366f1', '#8b5cf6',
+                '#ec4899', '#f43f5e', '#f97316', '#eab308', '#10b981'
+            ];
+
+            new Chart(ctxOwners, {
+                type: 'doughnut',
+                data: {
+                    labels: meygoonData.map(d => `${d.unitName} - ${d.owner}`),
+                    datasets: [{
+                        data: ownerTotals,
+                        backgroundColor: palette,
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                const percentage = Math.round((value / grandTotal) * 100);
+                                return percentage > 6 ? `${toPersianNum(percentage)}٪` : '';
+                            },
+                            color: '#ffffff',
+                            font: {
+                                weight: 'bold',
+                                size: 11
+                            }
+                        },
+                        tooltip: {
+                            rtl: true,
+                            callbacks: {
+                                label: (context) => {
+                                    const val = context.raw;
+                                    const pct = ((val / grandTotal) * 100).toFixed(1);
+                                    return `${toPersianNum(val)} تومان (${toPersianNum(pct)}٪)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        });
+    </script>
+</body>
+</html>
